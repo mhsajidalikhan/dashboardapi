@@ -1,34 +1,59 @@
-import { Link, Outlet } from "react-router-dom";
-import { useStateContext } from "../contextporvider/ContextProvider";
+import { Link, Outlet,Navigate } from "react-router-dom";
+import { useStateContext } from "../context/ContextProvider";
+import {useEffect} from "react";
+import axiosClient from "../axios-clients";
 
 
-export default function () {
-    const {user, token} = useStateContext();
+export default function DefaultLayout() {
+  const {user, token, setUser, setToken, notification} = useStateContext();
 
-    const onLogOut = (e) => {
-        e.preventDefault();
-    }
+  if (!token) {
+    return <Navigate to="/login"/>
+  }
 
-    return (
-        <div id="defaultLayout">
-            <aside>
-                <Link to="/dashboard">Dashboard</Link>
-                <Link to="/users">Users</Link>
-            </aside>
-            <div className="content">
+  const onLogout = ev => {
+    ev.preventDefault()
 
-                <header>
-                    <div>Header</div>
-                    <div>{user.name}
-                    <a href="#" onClick={onLogOut} className="btn-logout">Logout</a>
-                    </div>
-                  
-                </header>
-                <main>
-                    <Outlet />
-                </main>
-            </div>
+    axiosClient.post('/logout')
+      .then(() => {
+        setUser({})
+        setToken(null)
+      })
+  }
 
-        </div>
-    );
+  useEffect(() => {
+    axiosClient.get('/user')
+      .then(({data}) => {
+         setUser(data)
+      })
+  }, [])
+
+  return (
+    <div id="defaultLayout">
+      <aside>
+        <Link to="/dashboard">Dashboard</Link>
+        <Link to="/users">Users</Link>
+      </aside>
+      <div className="content">
+        <header>
+          <div>
+            Header
+          </div>
+
+          <div>
+            {user.name} &nbsp; &nbsp;
+            <a onClick={onLogout} className="btn-logout" href="#">Logout</a>
+          </div>
+        </header>
+        <main>
+          <Outlet/>
+        </main>
+        {notification &&
+          <div className="notification">
+            {notification}
+          </div>
+        }
+      </div>
+    </div>
+  )
 }
