@@ -7,6 +7,7 @@ import GuestLayout from './components/GuestLayout.jsx';
 import DefaultLayout from './components/DefaultLayout.jsx';
 import { Children } from 'react';
 import Dashboard from './views/Dashboard.jsx';
+import UserForm from './views/UserForm.jsx';
 
 
 
@@ -43,11 +44,19 @@ const router = createBrowserRouter([
             {
                 path: 'users',
                 element: <User />
+            },
+            {
+                path: 'users/new',
+                element: <UserForm  key='user-create'/>
+            },
+            {
+                path: 'users/:id',
+                element: <UserForm  key = 'user-update'/>
             }
 
         ]
     },
-  
+
 
 
 ])
